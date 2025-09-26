@@ -1,0 +1,355 @@
+from langgraph.graph import StateGraph, START, END
+from typing import TypedDict, Literal
+from langchain_google_genai import ChatGoogleGenerativeAI
+from pydantic import BaseModel, Field
+
+
+input_host_data="""{
+  "metadata": {
+    "description": "Censys host data for interview dataset",
+    "created_at": "2025-01-12",
+    "data_sources": ["censys_hosts"],
+    "hosts_count": 3,
+    "ips_analyzed": ["168.196.241.227", "1.92.135.168", "1.94.62.205"]
+  },
+  "hosts": [
+    {
+      "ip": "168.196.241.227",
+      "location": {
+        "city": "New York City",
+        "country": "United States",
+        "country_code": "US",
+        "coordinates": {
+          "latitude": 40.71427,
+          "longitude": -74.00597
+        }
+      },
+      "autonomous_system": {
+        "asn": 263744,
+        "name": "Udasha S.A.",
+        "country_code": "HN"
+      },
+      "services": [
+        {
+          "port": 11558,
+          "protocol": "SSH",
+          "banner": "SSH-2.0-OpenSSH_8.7",
+          "software": [
+            {
+              "product": "openssh",
+              "vendor": "openbsd",
+              "version": "8.7"
+            }
+          ],
+          "vulnerabilities": [
+            {
+              "cve_id": "CVE-2023-38408",
+              "severity": "critical",
+              "cvss_score": 9.8,
+              "description": "Known exploited vulnerability"
+            },
+            {
+              "cve_id": "CVE-2024-6387",
+              "severity": "high",
+              "cvss_score": 8.1,
+              "description": "Known exploited vulnerability"
+            }
+          ]
+        }
+      ],
+      "threat_intelligence": {
+        "security_labels": ["REMOTE_ACCESS"],
+        "risk_level": "high"
+      }
+    },
+    {
+      "ip": "1.92.135.168",
+      "location": {
+        "city": "Beijing",
+        "country": "China",
+        "country_code": "CN",
+        "coordinates": {
+          "latitude": 39.9075,
+          "longitude": 116.39723
+        }
+      },
+      "autonomous_system": {
+        "asn": 55990,
+        "name": "HWCSNET Huawei Cloud Service data center",
+        "country_code": "CN"
+      },
+      "dns": {
+        "hostname": "ecs-1-92-135-168.compute.hwclouds-dns.com"
+      },
+      "services": [
+        {
+          "port": 22,
+          "protocol": "SSH",
+          "banner": "SSH-2.0-OpenSSH_7.4",
+          "software": [
+            {
+              "product": "openssh",
+              "vendor": "openbsd",
+              "version": "7.4"
+            }
+          ],
+          "vulnerabilities": [
+            {
+              "cve_id": "CVE-2023-38408",
+              "severity": "critical",
+              "cvss_score": 9.8
+            },
+            {
+              "cve_id": "CVE-2018-15473",
+              "severity": "medium",
+              "cvss_score": 5.3
+            }
+          ]
+        },
+        {
+          "port": 8074,
+          "protocol": "HTTP",
+          "banner": "HTTP/1.1 404 Not Found",
+          "malware_detected": {
+            "name": "Cobalt Strike",
+            "type": "c2_server",
+            "confidence": 0.75,
+            "threat_actors": ["FIN7", "APT41", "Cobalt Group"]
+          }
+        },
+        {
+          "port": 8082,
+          "protocol": "HTTP",
+          "banner": "HTTP/1.1 401 Unauthorized",
+          "authentication_required": true
+        }
+      ],
+      "threat_intelligence": {
+        "security_labels": ["REMOTE_ACCESS"],
+        "malware_families": ["Cobalt Strike"],
+        "risk_level": "critical"
+      }
+    },
+    {
+      "ip": "1.94.62.205",
+      "location": {
+        "city": "Shanghai",
+        "country": "China",
+        "country_code": "CN",
+        "coordinates": {
+          "latitude": 31.22222,
+          "longitude": 121.45806
+        }
+      },
+      "autonomous_system": {
+        "asn": 55990,
+        "name": "HWCSNET Huawei Cloud Service data center",
+        "country_code": "CN"
+      },
+      "dns": {
+        "hostname": "ecs-1-94-62-205.compute.hwclouds-dns.com"
+      },
+      "operating_system": {
+        "vendor": "canonical",
+        "product": "linux"
+      },
+      "services": [
+        {
+          "port": 21,
+          "protocol": "FTP",
+          "banner": "220---------- Welcome to Pure-FTPd [privsep] [TLS] ----------",
+          "tls_enabled": true,
+          "certificate": {
+            "fingerprint_sha256": "44d514fa03d2266b47b53927fe01d5ed6974e3ec988f3d060e6d4dd10a552766",
+            "subject": "CN=1.94.62.205, O=BT-PANEL",
+            "issuer": "CN=1.94.62.205, O=BT-PANEL",
+            "self_signed": true
+          }
+        },
+        {
+          "port": 22,
+          "protocol": "SSH",
+          "banner": "SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.10",
+          "software": [
+            {
+              "product": "openssh",
+              "vendor": "openbsd",
+              "version": "8.9p1"
+            }
+          ],
+          "vulnerabilities": [
+            {
+              "cve_id": "CVE-2023-38408",
+              "severity": "critical",
+              "cvss_score": 9.8
+            },
+            {
+              "cve_id": "CVE-2024-6387",
+              "severity": "high",
+              "cvss_score": 8.1
+            }
+          ]
+        },
+        {
+          "port": 80,
+          "protocol": "HTTP",
+          "banner": "HTTP/1.1 200 OK",
+          "software": [
+            {
+              "product": "nginx",
+              "vendor": "f5"
+            }
+          ],
+          "response_details": {
+            "status_code": 200,
+            "title": "404 Not Found"
+          }
+        },
+        {
+          "port": 888,
+          "protocol": "HTTP",
+          "banner": "HTTP/1.1 403 Forbidden",
+          "software": [
+            {
+              "product": "nginx",
+              "vendor": "f5"
+            }
+          ],
+          "response_details": {
+            "status_code": 403,
+            "title": "403 Forbidden"
+          }
+        },
+        {
+          "port": 3306,
+          "protocol": "MYSQL",
+          "error_message": "Host '167.94.145.97' is not allowed to connect to this MySQL server",
+          "software": [
+            {
+              "product": "mysql",
+              "vendor": "oracle"
+            }
+          ],
+          "access_restricted": true
+        },
+        {
+          "port": 8011,
+          "protocol": "HTTP",
+          "banner": "HTTP/1.1 200",
+          "response_details": {
+            "status_code": 200,
+            "title": "Java Chains",
+            "content_language": "zh-CN"
+          }
+        },
+        {
+          "port": 37035,
+          "protocol": "HTTP",
+          "banner": "HTTP/1.1 404 Not Found",
+          "tls_enabled": true,
+          "certificate": {
+            "fingerprint_sha256": "921875de7ea0a4e8345872b4d9735270fb11b45a47ec0a8d8acc5f5d119908cb",
+            "subject": "CN=1.94.62.205, O=1.94.62.205",
+            "issuer": "CN=宝塔面板, O=宝塔面板",
+            "subject_alt_names": ["1.94.62.205", "192.168.14.115"]
+          },
+          "software": [
+            {
+              "product": "nginx",
+              "vendor": "f5"
+            }
+          ]
+        }
+      ],
+      "threat_intelligence": {
+        "security_labels": ["REMOTE_ACCESS"],
+        "risk_level": "high"
+      }
+    }
+  ]
+} """
+
+
+
+model=ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0, api_key="AIzaSyCcmGahyEk9YKdW1OTQqr6HveyelmjWUGM")
+
+model
+
+
+# Creation of a State
+
+class HostState(TypedDict):
+    host_data:dict
+    summary: str
+
+
+graph=StateGraph(HostState)
+
+graph # creating StateGraph object 
+
+
+## To be constructed Workflow(Initial Version):
+
+# START -> Summarizer -> END
+
+
+def summarize_host(state: HostState) -> HostState:
+
+    host_input_data = state['host_data']
+
+
+    prompt=f"""You are given a JSON dataset of hosts. Summarize the information per host (one IP at a time).  
+    Firstly, identify the number of hosts, and print it
+    Then, make the summaries very concise but informative.  
+    For each host, include:
+    - IP address  
+    - Location and ASN (with org name if present)  
+    - DNS/OS if available  
+    - Key services (port, protocol, software, and only notable details like TLS, auth required, or malware)  
+    - Vulnerabilities (list only CVE IDs with severity and CVSS score, mention “exploited” if noted)  
+    - Threat intel (risk level, labels, malware families if any)  
+    
+    Format the output in a compact bullet style so all critical intel is quickly visible.
+    Also, after each host summary, explain the summary of that host in 2 lines in a very informative way.
+    NOTE: If it seems like some hosts have empty fields or missing values, then just give that field value as 'Data Not Reported' 
+        and also make sure the reponse is in markdown format.
+    
+    host data:{host_input_data}"""
+
+    ## LLM Call
+    summary= model.invoke(prompt).content
+
+    ## update state
+    state['summary']=summary
+
+    return state
+    
+
+
+# Adding Node to Summarize the input host data
+
+graph.add_node("summarize", summarize_host)
+
+
+
+# Adding Edges and connecting the nodes
+
+graph.add_edge(START, 'summarize')
+
+graph.add_edge('summarize', END)
+
+
+# Compile the Graph
+
+agent = graph.compile()
+
+
+# Execute the Workflow
+
+initial_state={"host_data" : input_host_data}
+
+final_state = agent.invoke(initial_state)
+
+# final_state
+
+print(final_state['summary'])

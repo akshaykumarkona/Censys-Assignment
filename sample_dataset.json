@@ -1,0 +1,56 @@
+{
+  "metadata": {
+    "description": "Synthetic single-host dataset for testing",
+    "created_at": "2025-09-24",
+    "data_sources": ["synthetic_hosts"],
+    "hosts_count": 1,
+    "ips_analyzed": ["203.0.113.42"]
+  },
+  "hosts": [
+    {
+      "ip": "203.0.113.42",
+      "location": {
+        "city": "Berlin",
+        "country": "Germany",
+        "country_code": "DE",
+        "coordinates": {"latitude": 52.52, "longitude": 13.405}
+      },
+      "autonomous_system": {
+        "asn": 67890,
+        "name": "BerlinNet GmbH",
+        "country_code": "DE"
+      },
+      "dns": {"hostname": "host203.berlin.de"},
+      "operating_system": {"vendor": "canonical", "product": "linux"},
+      "services": [
+        {
+          "port": 22,
+          "protocol": "SSH",
+          "banner": "SSH-2.0-OpenSSH_8.8",
+          "software": [
+            {"product": "openssh", "vendor": "openbsd", "version": "8.8"}
+          ],
+          "vulnerabilities": [
+            {
+              "cve_id": "CVE-2023-99999",
+              "severity": "critical",
+              "cvss_score": 9.9,
+              "description": "Sample critical vulnerability"
+            }
+          ]
+        },
+        {
+          "port": 80,
+          "protocol": "HTTP",
+          "banner": "HTTP/1.1 200 OK",
+          "software": [{"product": "nginx", "vendor": "f5"}]
+        }
+      ],
+      "threat_intelligence": {
+        "security_labels": ["REMOTE_ACCESS", "WEB_APP"],
+        "malware_families": ["Emotet"],
+        "risk_level": "high"
+      }
+    }
+  ]
+}
