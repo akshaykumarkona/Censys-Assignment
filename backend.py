@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Body, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from summarizer import agent  # Your LangGraph / summarizer agent
+from summarizer import agent  # LangGraph agent
 import asyncio
 
 app = FastAPI(
@@ -9,7 +9,6 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Enable CORS for all domains (adjust origins in production)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
