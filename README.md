@@ -18,11 +18,11 @@ All results are formatted in **Markdown** for readability.
 ## Project Structure
 
 ```
-├── ui.py # Streamlit frontend for uploading JSON and viewing summaries
-├── backend.py # FastAPI backend that accepts JSON and calls the summarizer agent
-├── summarizer.py # LangGraph workflow with Gemini LLM summarization logic
-├── requirements.txt # Python dependencies
-└── README.md # Project documentation
+├── ui.py # Streamlit Frontend for uploading JSON and viewing summaries
+├── backend.py # FastAPI Backend that accepts JSON and calls the Summarizer Agent
+├── summarizer.py # LangGraph Agent workflow with Gemini LLM and Prompt used.
+├── requirements.txt # Python Dependencies
+└── README.md # Project Documentation
 ```
 
 
@@ -39,6 +39,8 @@ cd censys_summarizer
 ```bash
 python -m venv venv
 venv\Scripts\activate      # Windows
+or 
+## Open a new terminal for activation of created python virtual environment
 ```
 
 3. **Install dependencies**
@@ -58,7 +60,7 @@ uvicorn backend:app --reload
 
 *Swagger docs: http://localhost:8000/docs*
 
-2. *Launch the UI*
+2. *Launch the UI (Open a new terminal and make sure the python virtual environment is activated.)*
 ```bash
 streamlit run ui.py
 ```
@@ -144,9 +146,13 @@ This host runs SSH with a critical vulnerability, making it a high-risk remote a
 ### Agent Workflow
 
 The summarizer uses a LangGraph StateGraph workflow:
+ 
+
+> **Note:** In line with the assignment requirements, this project demonstrates a small agent design.  
+> To keep the implementation lightweight, the agent currently consists of only a single node — the '*Summarize Node*'.  
+>> API Key already provided for this assignment purpose. You can directly start using the agent without changing the API Key.
 
 ### *START → Summarize Node → END*
-
 
 - Input JSON is passed to the summarize_host node.
 
@@ -155,11 +161,32 @@ The summarizer uses a LangGraph StateGraph workflow:
 - FastAPI returns the summary to the Streamlit UI for display.
 
 ## Future Improvements
+- **Summary Modes**  
+  Provide an option for the user to choose between:
+  - *Quick Summary* (fast, high-level overview)  
+  - *Detailed Analysis* (deeper insights with more computation)  
 
-- Add richer schema validation for input JSON via Pydantic.
+- **Flexible Input Options**  
+  Allow users to either:  
+  - Upload a `.json` file  
+  - Paste raw JSON text directly into a text area  
 
-- Extend UI to support batch uploads.
+- **Export & Downloads**  
+  Enable users to download the generated summary in multiple formats:  
+  - `.md` (Markdown)  
+  - `.pdf`  
+  - `.docx`  
 
-- Add export options for summaries (PDF/CSV).
+- **Agent Enhancements**  
+  Improve the summarization agent by:  
+  - Adding new reasoning capabilities  
+  - Creating domain-specific features tailored to Censys/host data  
 
-- Deploy with Docker or Kubernetes for production use.
+- **Data Validation**  
+  Validate the JSON input before sending it to the API, ensuring required keys and structure are present.  
+
+- **Enhanced UI/UX**  
+  - More user-friendly interface with collapsible sections  
+
+- **Dataset Comparison**  
+  Allow users to upload and analyze **two JSON datasets** side by side for comparison.  
