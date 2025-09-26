@@ -3,7 +3,6 @@ import requests
 import json
 from summarizer import agent
 
-# Change if your backend runs elsewhere
 API_URL = "http://localhost:8000/summarize"
 
 st.set_page_config(page_title="Host Dataset Summarizer")
@@ -25,14 +24,12 @@ uploaded = st.file_uploader(
 
 if uploaded:
     try:
-        # Parse JSON
         input_data = json.load(uploaded)
 
-        # Success message with details
         st.success(f"File **{uploaded.name}** loaded successfully")
         st.caption(f"File size: {uploaded.size / 1024:.2f} KB")
 
-        # Show JSON preview
+        # JSON preview
         with st.expander("👀 Preview JSON content (first 1000 chars)"):
             preview = json.dumps(input_data, indent=2)[:1000]
             st.code(preview, language="json")
@@ -42,7 +39,7 @@ if uploaded:
 
 
 
-# Send to backend
+# Sending to backend
 if input_data is not None:
     if st.button("Generate Summary for Dataset"):
         with st.spinner("Please wait, Summarizing dataset...😊"):
@@ -50,18 +47,12 @@ if input_data is not None:
                 resp = requests.post(API_URL, json=input_data, timeout=120)
                 if resp.status_code == 200:
                     payload = resp.json()
-                    # Backend returns {"summary": "..."} per your latest spec
                     summary = payload.get("summary") or payload.get("summaries") or ""
                     if isinstance(summary, str):
                         st.subheader("Dataset Summary")
                         st.markdown(summary)
                     else:
-                        # fallback if backend returns other structure
-                        # st.write(payload)
-                        st.write("HI")
-                        # import json
-                        # st.markdown("```json\n" + json.dumps(payload, indent=2) + "\n```")
-
+                        st.write(payload)
                 else:
                     st.error(f"Backend error {resp.status_code}: {resp.text}")
             except requests.exceptions.RequestException as err:
