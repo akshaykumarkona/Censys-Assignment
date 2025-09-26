@@ -288,7 +288,7 @@ graph=StateGraph(HostState)
 graph # creating StateGraph object 
 
 
-## To be constructed Workflow(Initial Version):
+## Workflow:
 
 # START -> Summarizer -> END
 
@@ -296,7 +296,6 @@ graph # creating StateGraph object
 def summarize_host(state: HostState) -> HostState:
 
     host_input_data = state['host_data']
-
 
     prompt=f"""You are given a JSON dataset of hosts. Summarize the information per host (one IP at a time).  
     Firstly, identify the number of hosts, and print it
@@ -339,17 +338,17 @@ graph.add_edge(START, 'summarize')
 graph.add_edge('summarize', END)
 
 
-# Compile the Graph
+# Compiling the Graph
 
 agent = graph.compile()
 
 
-# Execute the Workflow
+# Executing the Workflow
 
 initial_state={"host_data" : input_host_data}
 
-final_state = agent.invoke(initial_state)
+# final_state = agent.invoke(initial_state)
 
 # final_state
 
-print(final_state['summary'])
+# print(final_state['summary'])
