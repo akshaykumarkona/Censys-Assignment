@@ -1,0 +1,30 @@
+Future Enhancement List:
+1) Summary Modes  
+Provide an option for the user to choose between:  
+- Quick Summary (fast, high-level overview)  
+- Detailed Analysis (deeper insights with more computation)  
+
+2) Flexible Input Options  
+Allow users to either:  
+- Upload a .json file  
+- Paste raw JSON text directly into a text area  
+
+3) Export & Downloads  
+Enable users to download the generated summary in multiple formats:  
+- .md (Markdown)  
+- .pdf  
+- .docx  
+
+4) Agent Enhancements  
+Improve the summarization agent by:  
+- Adding new reasoning capabilities  
+- Creating domain-specific features tailored to Censys/host data  
+
+5) Data Validation  
+Validate the JSON input before sending it to the API, ensuring required keys and structure are present.  
+
+6) Enhanced UI/UX  
+- More user-friendly interface with collapsible sections  
+
+7) Dataset Comparison  
+Allow users to upload and analyze two JSON datasets side by side for comparison.  
